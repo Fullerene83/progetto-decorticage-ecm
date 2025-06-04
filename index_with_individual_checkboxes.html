@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shape Editor</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+    input, select { width: 80px; }
+    pre { background: #f5f5f5; padding: 10px; margin-top: 20px; }
+    canvas { border: 2px solid #000; margin-top: 20px; display: block; }
+    .measure-btn.active {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+    .label-input { box-sizing: border-box; padding: 2px; border: 1px solid #888; border-radius: 2px; }
+    .measure-input {
+      box-sizing: border-box;
+      padding: 2px;
+      border: 1px solid green;
+      border-radius: 2px;
+      background: #e0ffe0;
+      color: green;
+      font-weight: bold;
+      cursor: move;
+    }
+    #zoomControls {
+      margin-top: 8px;
+      padding: 8px;
+      border: 2px solid #444;
+      background: #fff;
+      display: inline-block;
+    }
+  </style>
+
+<style>
+#canvasScroll {
+  border: 2px solid black;
+  box-sizing: border-box;
+  width: 1000px;
+  height: 600px;
+  overflow: scroll;
+}
+</style>
+</head>
+<body>
+  <div style="display: flex; align-items: flex-start; gap: 40px;">
+    <div style="flex: 1;">
+      <h2>Crea una nuova forma rebar (stile interfaccia classica)</h2>
+      <label>Codice forma: <input id="shapeCode" type="text" placeholder="Es. S25A"></label>
+      <label>Descrizione: <input id="shapeLabel" type="text" placeholder="Es. Staffa 25x25"></label>
+      <table>
+        <tr><th colspan="2">Diamètre</th><th colspan="2">⌀ Mandrin (mm)</th></tr>
+        <tr>
+          <td colspan="2"><input id="diameter" type="text" value="10HA" oninput="generateJSON()"></td>
+          <td colspan="2"><input id="mandrel" type="number" value="40" min="1" oninput="generateJSON()"></td>
+        </tr>
+        <tr><th colspan="4">Angle de départ</th></tr>
+        <tr><td colspan="4"><input id="startAngle" type="number" value="0" oninput="generateJSON()"></td></tr>
+        <tr><th>P</th><th>C</th><th>Rayon</th><th>Longhezza</th><th>Angolo</th></tr>
+        <tbody id="segmentRows"></tbody>
+      </table>
+      <button id="addRowBtn" onclick="addSegmentRow()">+ Aggiungi riga</button>
+    </div>
+    <div>
+      <div id="canvasScroll"   style="border: 2px solid black;" style="border: 2px solid black;" style="border: 2px solid black;">
+        <div id="canvasWrapper" style="position: relative; width: 3000px; height: 2000px;" style="border: 2px solid black;" style="border: 2px solid black;">
+          <canvas id="previewCanvas" width="3000" height="2000"   ></canvas>
+        </div>
+      </div>
+      <div id="zoomControls">
+        Zoom: <strong><span id="zoomDisplay">100%</span></strong>
+        <button id="zoomInBtn" onclick="zoomIn()">➕</button>
+        <button id="zoomOutBtn" onclick="zoomOut()">➖</button> 
+        <input id="zoomInput" type="number" value="100" style="width: 50px;" oninput="setZoom(this.value)">%
+        <button id="lockButton" onclick="toggleLock()">🔓</button>
+        <button id="resetZoomBtn" onclick="resetZoom()">🔄 Reset zoom</button>
+        <label style="margin-left:8px;">Line Width: <input id="lineWidthInput" type="number" min="1" max="20" value="2" style="width:50px;">px &nbsp;&nbsp;&nbsp; Snap Radius: <input id="snapRadiusInput" type="number" min="1" step="0.5" value="5" style="width:50px;">px</label>
+        <div id="measureControls" style="margin-top: 8px;">
+          <button id="measureLinearBtn" class="measure-btn">Linear</button>
+          <button id="measureAngularBtn" class="measure-btn">Angular</button>
+          <button id="measureArcBtn" class="measure-btn">Arc Length</button>
+          <button id="toggleSnapBtn" class="measure-btn">Snap Points: OFF</button>
+          <!-- Clear Measures button is added dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:20px;">
+    <button id="saveShapeBtn" onclick="saveShapeJSON()">💾 Salva shape</button>
+    <button id="loadShapeBtn" onclick="loadShapeJSON()">📂 Carica shape</button>
+    <input type="file" id="fileInput" style="display:none;">
+    <div id="summary" style="margin-top:10px;font-weight:bold;">Totale L = 0.00 m | Peso = 0.00 kg</div>
+    <br>
+    <button id="zoomToFitBtn" onclick="zoomToFit()">🔍 Zoom to Fit</button>
+    <button id="resetTableBtn" onclick="resetTable()">🔄 Reset tabella</button>
+    <h3>Anteprima JSON</h3>
+    <pre id="jsonPreview">{}</pre>
+  </div>
+  <script src="measurement.js"></script>
+<script src="editor_script.js"></script>
+<script src="editor_interactive.js"></script>
+  <script>
+    window.addEventListener('load', () => {
+      const scrollDiv = document.getElementById("canvasScroll");
+      scrollDiv.scrollLeft = 1000;
+      scrollDiv.scrollTop = 650;
+    });
+  </script>
+</body>
+</html>
