@@ -1,5 +1,5 @@
 
-// editor_interactive.js - offset visivo stabile durante zoom
+// editor_interactive.js - stabile: offset costante, tag visivi non deformati
 
 let shapeObject = {
   code: '', description: '', diameter: '', mandrel: 0,
@@ -66,6 +66,10 @@ function renderLabelInputs() {
     const color = lbl.type === 'length' ? 'black' : 'red';
     input.style.color = color;
     input.style.borderColor = color;
+    input.style.padding = '0px';
+    input.style.margin = '0px';
+    input.style.height = 'auto';
+    input.style.minWidth = '2ch';
     wrapper.appendChild(input);
   });
 
@@ -73,14 +77,14 @@ function renderLabelInputs() {
 }
 
 function updateLabelInputPositions() {
+  const offsetPx = 12;
   const inputs = document.querySelectorAll('.label-input');
-  const pixelOffset = 12; // distanza visiva costante
   inputs.forEach((input, i) => {
     const lbl = shapeObject.labels[i];
-    const cx = lbl.x * zoom + panOffset.x;
-    const cy = lbl.y * zoom + panOffset.y;
-    const px = cx + (lbl.ux || 0) * pixelOffset;
-    const py = cy + (lbl.uy || 0) * pixelOffset;
+    const baseX = lbl.x * zoom + panOffset.x;
+    const baseY = lbl.y * zoom + panOffset.y;
+    const px = baseX + (lbl.ux || 0) * offsetPx;
+    const py = baseY + (lbl.uy || 0) * offsetPx;
     input.style.left = px + 'px';
     input.style.top = py + 'px';
   });
