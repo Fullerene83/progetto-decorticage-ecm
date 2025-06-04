@@ -152,3 +152,4 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // TODO: insert preservation logic - fallback
+// trigger GitHub Pages build
