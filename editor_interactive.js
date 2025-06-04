@@ -1,5 +1,5 @@
 
-// editor_interactive.js - versione corretta per GitHub Pages
+// editor_interactive.js - offset visivo stabile durante zoom
 
 let shapeObject = {
   code: '', description: '', diameter: '', mandrel: 0,
@@ -36,14 +36,14 @@ function initDefaultLabels() {
       const midX = x + dx / 2;
       const midY = y + dy / 2;
       const norm = Math.hypot(dx, dy);
-      const offsetX = -dy / norm * 10;
-      const offsetY = dx / norm * 10;
-      shapeObject.labels.push({ x: midX, y: midY, ox: offsetX, oy: offsetY, text: String.fromCharCode(64 + lengthCounter), type: 'length' });
+      const ux = -dy / norm;
+      const uy = dx / norm;
+      shapeObject.labels.push({ x: midX, y: midY, ux, uy, text: String.fromCharCode(64 + lengthCounter), type: 'length' });
       x += dx;
       y += dy;
     } else if (s.type === 'angle') {
       angleCounter++;
-      shapeObject.labels.push({ x: x, y: y, ox: 10, oy: 10, text: greek[angleCounter - 1], type: 'angle' });
+      shapeObject.labels.push({ x: x, y: y, ux: 0.7, uy: 0.7, text: greek[angleCounter - 1], type: 'angle' });
       ang += s.value * Math.PI / 180;
     }
   });
@@ -74,10 +74,13 @@ function renderLabelInputs() {
 
 function updateLabelInputPositions() {
   const inputs = document.querySelectorAll('.label-input');
+  const pixelOffset = 12; // distanza visiva costante
   inputs.forEach((input, i) => {
     const lbl = shapeObject.labels[i];
-    const px = (lbl.x + (lbl.ox || 0)) * zoom + panOffset.x;
-    const py = (lbl.y + (lbl.oy || 0)) * zoom + panOffset.y;
+    const cx = lbl.x * zoom + panOffset.x;
+    const cy = lbl.y * zoom + panOffset.y;
+    const px = cx + (lbl.ux || 0) * pixelOffset;
+    const py = cy + (lbl.uy || 0) * pixelOffset;
     input.style.left = px + 'px';
     input.style.top = py + 'px';
   });
